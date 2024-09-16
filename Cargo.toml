@@ -1,4 +1,3 @@
-workspace = { members = ["gemini_hello"] }
 [package]
 name = "ask_gemini"
 version = "0.1.4"

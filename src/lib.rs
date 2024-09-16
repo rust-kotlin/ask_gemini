@@ -21,10 +21,11 @@ pub struct Gemini {
     client: Arc<Client>,
     api_key: String,
     model: String,
+    proxy: Option<String>,
 }
 
 impl Gemini {
-    pub fn new(api_key: Option<&str>, model: Option<&str>) -> Self {
+    pub fn new(api_key: Option<&str>, model: Option<&str>, proxy: Option<&str>) -> Self {
         let api_key = api_key
             .map(String::from)
             .or_else(|| env::var("GEMINI_API_KEY").ok())
@@ -34,14 +35,21 @@ impl Gemini {
             client: Arc::new(Client::new()),
             api_key,
             model: model.unwrap_or("gemini-1.5-flash").to_string(),
+            proxy: proxy.map(String::from),
         }
     }
 
     pub async fn ask(&self, prompt: &str) -> Result<Vec<String>, GeminiError> {
-        let url = format!(
-            "https://generativelanguage.googleapis.com/v1beta/models/{}:generateContent?key={}",
-            self.model, self.api_key
-        );
+        let url = match &self.proxy {
+            None => format!(
+                "https://generativelanguage.googleapis.com/v1beta/models/{}:generateContent?key={}",
+                self.model, self.api_key
+            ),
+            Some(proxy) => format!(
+                "https://{}/v1beta/models/{}:generateContent?key={}",
+                proxy, self.model, self.api_key
+            ),
+        };
 
         let body = RequestBody {
             contents: vec![Content {

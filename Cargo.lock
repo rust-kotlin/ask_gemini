@@ -214,14 +214,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "gemini_hello"
-version = "0.1.0"
-dependencies = [
- "ask_gemini",
- "tokio",
-]
-
-[[package]]
 name = "gimli"
 version = "0.29.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
